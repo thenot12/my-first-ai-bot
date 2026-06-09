@@ -1,13 +1,13 @@
 import streamlit as st
 import os
-from google import genai  # 최신 정식 패키지 로드 문법
+from google import genai  # 2026년형 최신 정식 패키지 로드 방식
 
-# 1. Render 시스템 환경 변수에서 안전하게 키 가져오기
+# 1. os.environ을 사용해 Render 시스템 환경 변수에서 직접 키 가져오기
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
     try:
-        # 최신 패키지는 Client 객체를 생성하여 통신합니다 (v1beta 통로를 원천 차단)
+        # 최신 패키지는 Client 객체 하나로 아주 깔끔하게 통신을 시작합니다.
         client = genai.Client(api_key=GEMINI_API_KEY)
     except Exception as e:
         st.error(f"클라이언트 초기화 실패: {e}")
@@ -26,7 +26,7 @@ if st.button("AI에게 물어보기"):
     if user_input:
         with st.spinner("AI 비서가 답변을 생각하고 있습니다..."):
             try:
-                # 최신 라이브러리의 정식 모델 호출 및 답변 생성 문법
+                # 최신 라이브러리의 표준 텍스트 생성 문법입니다.
                 response = client.models.generate_content(
                     model='gemini-1.5-flash',
                     contents=user_input,
