@@ -1,33 +1,41 @@
-# streamlit 라이브러리 불러오기
 import streamlit as st
-import time
+from openai import OpenAI
+import os
 
-# 웹페이지 제목 설정
+# OpenAI 클라이언트 생성
+client = OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"]
+)
+
+# 제목
 st.title("광영의 AI 챗봇")
 
-# 안내 문구 출력
-st.write("궁금한 내용을 입력하고 버튼을 눌러보세요.")
+# 설명
+st.write("무엇이든 질문해보세요!")
 
-# 사용자 질문 입력창 생성
+# 질문 입력
 question = st.text_input("질문을 입력하세요")
 
-# 버튼 생성
+# 버튼
 if st.button("질문하기"):
 
-    # 질문이 입력되었는지 확인
     if question:
 
-        # 로딩 메시지 표시
         with st.spinner("AI가 답변을 준비 중입니다..."):
-            # 2초 대기 (AI가 생각하는 것처럼 보이게 함)
-            time.sleep(2)
 
-        # 임시 답변 출력
-        st.success("답변 완료!")
+            try:
+                response = client.responses.create(
+                    model="gpt-5",
+                    input=question
+                )
 
-        st.write("### AI 답변")
-        st.write(f"'{question}'에 대한 답변입니다.")
-        st.write("현재는 테스트 버전입니다. 나중에 실제 AI API를 연결할 수 있습니다.")
+                answer = response.output_text
+
+                st.success("답변 완료!")
+                st.write(answer)
+
+            except Exception as e:
+                st.error(f"오류 발생: {e}")
 
     else:
-        st.warning("질문을 먼저 입력해주세요.")
+        st.warning("질문을 입력해주세요.")
