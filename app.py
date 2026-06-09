@@ -21,7 +21,7 @@ if st.button("AI에게 물어보기"):
         with st.spinner("AI 비서가 답변을 생각하고 있습니다..."):
             try:
                 # 최신 제미나이 모델 호출
-                model = genai.GenerativeModel('gemini-pro')
+                model = genai.GenerativeModel('gemini-1.5-flash')
                 
                 # 제미나이에게 군더더기 없는 일반 답변 요청
                 response = model.generate_content(user_input)
