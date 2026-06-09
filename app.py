@@ -1,12 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
+import os  # 렌더 시스템 금고를 직접 열기 위한 현업 필수 라이브러리
 
-# 1. 렌더 환경변수에서 제미나이 API 키 가져오기
-try:
-    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+# 1. os.environ을 사용해 Render 시스템 환경 변수에서 직접 키 가져오기
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-except Exception:
-    st.error("Render 설정에서 GEMINI_API_KEY를 등록해주세요!")
+else:
+    st.error("Render 설정(Environment)에서 GEMINI_API_KEY를 찾을 수 없습니다!")
 
 # 웹사이트 제목 구성
 st.title("🤖 광영의 AI 스마트 비서")
@@ -23,7 +25,7 @@ if st.button("AI에게 물어보기"):
                 # 최신 제미나이 모델 호출
                 model = genai.GenerativeModel('gemini-1.5-flash')
                 
-                # 제미나이에게 군더더기 없는 일반 답변 요청
+                # 제미나이에게 일반 답변 요청
                 response = model.generate_content(user_input)
                 
                 st.success("💡 AI 비서의 답변이 완료되었습니다!")
