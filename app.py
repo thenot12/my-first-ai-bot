@@ -1,17 +1,16 @@
 import streamlit as st
-import google.generativeai as genai
 import os
+from google import genai  # 최신 정식 패키지 로드 문법
 
 # 1. Render 시스템 환경 변수에서 안전하게 키 가져오기
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
-    # [치트키 1] 구글 라이브러리가 낡았더라도 최신 정식 v1 통로를 바라보도록 강제 환경변수 주입
-    os.environ["STREAMLIT_GOOGLE_ENTRYPOINT_VERSION"] = "v1"
-    
-    # [치트키 2] 구글 클라이언트 환경을 'v1' 정식 버전으로 고정하여 초기화
-    client_options = {"api_version": "v1"}
-    genai.configure(api_key=GEMINI_API_KEY, client_options=client_options)
+    try:
+        # 최신 패키지는 Client 객체를 생성하여 통신합니다 (v1beta 통로를 원천 차단)
+        client = genai.Client(api_key=GEMINI_API_KEY)
+    except Exception as e:
+        st.error(f"클라이언트 초기화 실패: {e}")
 else:
     st.error("Render 설정(Environment)에서 GEMINI_API_KEY를 찾을 수 없습니다!")
 
@@ -27,11 +26,11 @@ if st.button("AI에게 물어보기"):
     if user_input:
         with st.spinner("AI 비서가 답변을 생각하고 있습니다..."):
             try:
-                # v1 통로에서 가장 완벽하게 지원하는 최신 무료 모델 지정
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                
-                # 답변 생성 요청
-                response = model.generate_content(user_input)
+                # 최신 라이브러리의 정식 모델 호출 및 답변 생성 문법
+                response = client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=user_input,
+                )
                 
                 st.success("💡 AI 비서의 답변이 완료되었습니다!")
                 st.write(response.text)
