@@ -1,14 +1,15 @@
 import streamlit as st
 import os
-import google.genai as genai  # 충돌을 원천 차단하는 정석 로드 방식
+# google 이름 공간 충돌을 완전히 회피하는 최신 정석 임포트 문법
+from google.genai import Client
 
-# 1. os.environ을 사용해 Render 시스템 환경 변수에서 직접 키 가져오기
+# 1. Render 시스템 환경 변수에서 직접 키 가져오기 (보안 유지)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 if GEMINI_API_KEY:
     try:
-        # 최신 google-genai 라이브러리의 공식 클라이언트 생성 문법
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        # 공식 가이드에 따른 최신 클라이언트 초기화
+        client = Client(api_key=GEMINI_API_KEY)
     except Exception as e:
         st.error(f"클라이언트 초기화 실패: {e}")
 else:
@@ -26,7 +27,7 @@ if st.button("AI에게 물어보기"):
     if user_input:
         with st.spinner("AI 비서가 답변을 생각하고 있습니다..."):
             try:
-                # 2026년 기준 가장 안정적인 최신 무료 모델 호출
+                # 2026년 기준 가장 완벽하게 작동하는 정식 텍스트 생성 문법
                 response = client.models.generate_content(
                     model='gemini-1.5-flash',
                     contents=user_input,
